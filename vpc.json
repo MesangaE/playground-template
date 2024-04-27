@@ -1,0 +1,75 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+"Description": "Template for adaptable playgrounds in aws",
+    "Resource" : { 
+        "MyVPC" : {
+        "Type": "AWS::EC2::VPC",
+        "Properties": {
+            "CidrBlock": "10.0.0.0/16",
+            "Tags": [{ "Name" : "myplaygroundVPC"}]
+        }
+        },
+        "MyigwName": {
+        "Type": "AWS::EC2::InternetGateway",
+        "Properties": {
+            "Tags": [{ "key" : "", "Value" : ""}]
+        }
+        },
+        "AttachGateway": {
+        "Type": "AWS::EC2::VPCGatewayAttachment",
+        "Properties": {
+            "VpcId": { "Ref" : "MyVPC"},
+            "InternetGatewayId": { "Ref": "MyigwName" }
+        }
+        },
+        "MySubnet" : {
+            "Type" : "AWS::EC2::Subnet",
+            "Properties" : {
+                "AvailabilityZone" : "us-east-1",
+                "AvailabilityZoneId" : "us-east-1a",
+                "CidrBlock" : "10.0.0.1/24",
+                "Tags" : [{ "key" : "", "Value" : ""}],
+                "VpcId" : { "Ref" : "MyVPC"}
+            }
+        },
+        "keyPair": {
+        "Type": "AWS::EC2::KeyPair",
+        "Properties": {
+            "KeyName": "",
+        },
+        
+        "secGroupName" : {
+        "Type" : "AWS::EC2::SecurityGroup",
+        "Properties" : {
+            "GroupDescription" : "-", // what type of traffic are you allowing
+            "SecurityGroupIngress" : [{
+                "IpProtocol" : "tcp",
+                "From" : 80, // subject to change
+                "ToPort" : 80,
+                "CidrIp" : "0.0.0.0/0"
+            }],
+            "SecurityGroupEgress" : [{
+                "IpProtocol" : "tcp",
+                "From" : 80, // subject to change
+                "ToPort" : 80,
+                "CidrIp" : "0.0.0.0/0"
+            }],
+            "VpcId" : { "Ref" : "MyVPC"},
+        }
+        },
+        "MyInstance" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "AvailabilityZone" : "us-east-1",
+                "ImageId" : "",
+                "InstanceType" : "t2.medium",
+                "KeyName" : { "Ref" : "KeyPair"},
+                "SecurityGroups" : {"Ref" : "secGroupName"},
+                "SubnetId" : { "Ref" : "MySubnet"},
+                "Tags" : [{ "Key" : "", "Value" : ""}],
+                "UserData" : ""
+            }
+        }
+    } 
+  }   
+}    
